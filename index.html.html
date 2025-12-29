@@ -1,0 +1,2004 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Palettes Couleurs Professionnelles</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e40af;
+            --dark-bg: #0a0e27;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background: var(--dark-bg);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2em; font-weight: 700; margin-bottom: 10px; }
+        .header p { font-size: 1.1em; opacity: 0.95; }
+        
+        .content { padding: 40px; }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 30px;
+        }
+        
+        .sidebar {
+            background: var(--gray-100);
+            padding: 25px;
+            border-radius: 12px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .form-group { margin-bottom: 25px; }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--gray-800);
+        }
+        
+        select, input[type="color"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        input[type="color"] {
+            height: 50px;
+            cursor: pointer;
+        }
+        
+        .radio-group {
+            display: grid;
+            gap: 10px;
+        }
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .radio-item:hover {
+            border-color: var(--primary);
+            background: #f0f7ff;
+        }
+        .radio-item input[type="radio"] {
+            accent-color: var(--primary);
+        }
+        .radio-item label {
+            cursor: pointer;
+            margin: 0;
+            font-weight: 500;
+        }
+        
+        .btn {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+        }
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .palette-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .palette-colors {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .color-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .color-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        
+        .color-swatch {
+            height: 120px;
+            position: relative;
+        }
+        
+        .color-info {
+            padding: 15px;
+            background: white;
+        }
+        .color-name {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--gray-800);
+        }
+        .color-codes {
+            font-size: 0.85em;
+            color: var(--gray-600);
+            font-family: 'Courier New', monospace;
+        }
+        .color-codes div {
+            margin: 3px 0;
+        }
+        
+        .copy-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 600;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .copy-indicator.show { opacity: 1; }
+        
+        .preview-section {
+            margin-top: 40px;
+        }
+        .preview-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--gray-200);
+            overflow-x: auto;
+        }
+        .preview-tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray-600);
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .preview-tab:hover { color: var(--primary); }
+        .preview-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .preview-content {
+            background: var(--gray-100);
+            border-radius: 12px;
+            padding: 30px;
+            min-height: 400px;
+        }
+        
+        .preview-panel { display: none; }
+        .preview-panel.active { display: block; }
+        
+        /* Website Preview - Design moderne réaliste */
+        .website-preview {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        .web-header {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+        .web-logo {
+            font-size: 1.3em;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .web-nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        .web-nav-item {
+            padding: 8px 0;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .web-nav-btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        .web-hero {
+            padding: 80px 40px;
+            text-align: center;
+            position: relative;
+        }
+        .web-hero h2 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1px;
+        }
+        .web-hero p {
+            font-size: 1.3em;
+            margin-bottom: 35px;
+            opacity: 0.85;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .web-cta {
+            display: inline-block;
+            padding: 18px 45px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1.05em;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+            transition: all 0.3s;
+        }
+        .web-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+        .web-features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            padding: 60px 40px;
+            background: #fafafa;
+        }
+        .web-feature {
+            padding: 30px;
+            border-radius: 16px;
+            background: white;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            transition: all 0.3s;
+        }
+        .web-feature:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        .web-feature-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+        .web-feature h3 {
+            margin-bottom: 12px;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+        .web-feature p {
+            color: #6b7280;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+        
+        /* Business Card Preview - Recto/Verso réaliste */
+        .business-card-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .business-card {
+            width: 350px;
+            height: 200px;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+        .business-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .bc-logo {
+            font-size: 1.8em;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .bc-info {
+            font-size: 0.9em;
+        }
+        .bc-name {
+            font-weight: 700;
+            font-size: 1.3em;
+            margin-bottom: 8px;
+            letter-spacing: -0.3px;
+        }
+        .bc-title {
+            opacity: 0.85;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        .bc-contact {
+            opacity: 0.75;
+            font-size: 0.85em;
+            line-height: 1.8;
+        }
+        .bc-label {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 0.7em;
+            opacity: 0.5;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Flyer Preview - A4 réaliste */
+        .flyer-container {
+            perspective: 1500px;
+            display: flex;
+            justify-content: center;
+        }
+        .flyer {
+            width: 100%;
+            max-width: 420px;
+            aspect-ratio: 1/1.414;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 
+                0 2px 4px rgba(0,0,0,0.1),
+                0 8px 16px rgba(0,0,0,0.1),
+                0 16px 32px rgba(0,0,0,0.1);
+            transform: rotateX(2deg) rotateY(-2deg);
+            transition: all 0.3s;
+        }
+        .flyer:hover {
+            transform: rotateX(0deg) rotateY(0deg);
+            box-shadow: 
+                0 4px 8px rgba(0,0,0,0.12),
+                0 12px 24px rgba(0,0,0,0.12),
+                0 24px 48px rgba(0,0,0,0.12);
+        }
+        .flyer-header {
+            padding: 50px 35px;
+            text-align: center;
+            position: relative;
+        }
+        .flyer-title {
+            font-size: 2.8em;
+            font-weight: 900;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+            line-height: 1;
+        }
+        .flyer-subtitle {
+            font-size: 1.3em;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+        .flyer-body {
+            padding: 35px;
+        }
+        .flyer-section {
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .flyer-section h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .flyer-section p {
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+        .flyer-cta {
+            margin: 20px 35px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.2em;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        /* Logo Preview - Mockup professionnel */
+        .logo-preview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+        }
+        .logo-main {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+        .logo-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            font-weight: 800;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .logo-circle::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .logo-square {
+            width: 180px;
+            height: 180px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            font-weight: 800;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        }
+        .logo-applications {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            width: 100%;
+        }
+        .logo-app {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            font-weight: 700;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            position: relative;
+            overflow: hidden;
+        }
+        .logo-app::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            font-size: 0.3em;
+            opacity: 0.4;
+            font-weight: 500;
+        }
+        
+        /* Mobile App Preview - iPhone réaliste */
+        .mobile-container {
+            display: flex;
+            justify-content: center;
+            perspective: 1000px;
+        }
+        .mobile-preview {
+            width: 320px;
+            height: 640px;
+            border-radius: 40px;
+            box-shadow: 
+                0 0 0 12px #1f2937,
+                0 0 0 14px #374151,
+                0 20px 60px rgba(0,0,0,0.4);
+            overflow: hidden;
+            position: relative;
+            background: white;
+        }
+        .mobile-preview::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140px;
+            height: 30px;
+            background: #1f2937;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+        .mobile-statusbar {
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            padding-top: 8px;
+        }
+        .mobile-header {
+            padding: 20px;
+            font-size: 1.5em;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+        .mobile-content {
+            padding: 20px;
+            overflow-y: auto;
+            height: calc(100% - 110px);
+        }
+        .mobile-card {
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        .mobile-card-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 1.05em;
+        }
+        .mobile-card-text {
+            opacity: 0.7;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        .mobile-tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 20px 20px;
+            border-top: 1px solid rgba(0,0,0,0.06);
+        }
+        .mobile-tab {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2em;
+        }
+        
+        .info-box {
+            background: #dbeafe;
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .info-box h3 {
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+        .info-box p {
+            color: #1e3a8a;
+            margin: 5px 0;
+        }
+        
+        .psychology-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .psychology-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        .psychology-item h4 {
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        .psychology-item p {
+            font-size: 0.85em;
+            color: var(--gray-600);
+        }
+        
+        @media (max-width: 1024px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: static;
+            }
+            .web-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header { padding: 30px 20px; }
+            .header h1 { font-size: 1.5em; }
+            .content { padding: 25px 20px; }
+            .palette-colors {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>Générateur de Palettes Couleurs</h1>
+                <p>Créez des harmonies parfaites pour tous vos projets</p>
+            </div>
+
+            <div class="content">
+                <div class="grid-2">
+                    <!-- SIDEBAR -->
+                    <div class="sidebar">
+                        <div class="form-group">
+                            <label>Contexte d'utilisation :</label>
+                            <select id="context" onchange="updateContextInfo()">
+                                <option value="web">Web / Digital</option>
+                                <option value="print">Print / Papier</option>
+                                <option value="brand">Identité d'entreprise</option>
+                                <option value="creative">Passion / Créatif</option>
+                                <option value="marketing">Marketing / Flyers</option>
+                                <option value="architecture">Architecture / Espace</option>
+                                <option value="fashion">Mode / Textile</option>
+                                <option value="food">Food / Restaurant</option>
+                                <option value="beauty">Beauté / Wellness</option>
+                                <option value="tech">Gaming / Tech</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Type d'activité :</label>
+                            <select id="industry" onchange="updateContextInfo()">
+                                <option value="luxury">Luxe</option>
+                                <option value="tech">Technologie</option>
+                                <option value="health">Santé</option>
+                                <option value="finance">Finance</option>
+                                <option value="education">Éducation</option>
+                                <option value="ecology">Écologie</option>
+                                <option value="sport">Sport</option>
+                                <option value="culture">Culture</option>
+                                <option value="food">Alimentation</option>
+                                <option value="real-estate">Immobilier</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Type d'harmonie :</label>
+                            <div class="radio-group">
+                                <div class="radio-item">
+                                    <input type="radio" id="mono" name="harmony" value="monochromatic" checked onchange="generatePalette()">
+                                    <label for="mono">Monochromatique</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" id="analog" name="harmony" value="analogous" onchange="generatePalette()">
+                                    <label for="analog">Analogues</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" id="comp" name="harmony" value="complementary" onchange="generatePalette()">
+                                    <label for="comp">Complémentaires</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" id="triad" name="harmony" value="triadic" onchange="generatePalette()">
+                                    <label for="triad">Triadiques</label>
+                                </div>
+                                <div class="radio-item">
+                                    <input type="radio" id="tetra" name="harmony" value="tetradic" onchange="generatePalette()">
+                                    <label for="tetra">Tétradiques</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Couleur de base :</label>
+                            <input type="color" id="baseColor" value="#2563eb" onchange="generatePalette()">
+                        </div>
+
+                        <button class="btn btn-primary" onclick="generatePalette()">Générer Palette</button>
+                        <button class="btn btn-secondary" onclick="randomPalette()">Aléatoire</button>
+
+                        <div id="contextInfo" class="info-box" style="margin-top: 20px;">
+                            <!-- Info contexte sera inséré ici -->
+                        </div>
+                    </div>
+
+                    <!-- MAIN CONTENT -->
+                    <div>
+                        <div class="palette-container">
+                            <h2 style="margin-bottom: 20px;">Votre Palette</h2>
+                            <div class="palette-colors" id="paletteColors">
+                                <!-- Couleurs générées ici -->
+                            </div>
+
+                            <div id="psychologyInfo">
+                                <!-- Psychologie des couleurs -->
+                            </div>
+                        </div>
+
+                        <div class="preview-section">
+                            <h2 style="margin-bottom: 20px;">Aperçus Contextuels</h2>
+                            
+                            <div class="preview-tabs">
+                                <button class="preview-tab active" onclick="switchPreview('website')">Site Web</button>
+                                <button class="preview-tab" onclick="switchPreview('card')">Carte de Visite</button>
+                                <button class="preview-tab" onclick="switchPreview('flyer')">Flyer</button>
+                                <button class="preview-tab" onclick="switchPreview('logo')">Logo</button>
+                                <button class="preview-tab" onclick="switchPreview('wall')">Mur/Espace</button>
+                                <button class="preview-tab" onclick="switchPreview('mobile')">App Mobile</button>
+                            </div>
+
+                            <div class="preview-content">
+                                <!-- Website Preview -->
+                                <div id="preview-website" class="preview-panel active">
+                                    <div class="website-preview">
+                                        <div class="web-header" id="webHeader">
+                                            <div class="web-logo" id="webLogo">BRAND</div>
+                                            <div class="web-nav">
+                                                <div class="web-nav-item" id="webNav1">Accueil</div>
+                                                <div class="web-nav-item" id="webNav2">Produits</div>
+                                                <div class="web-nav-item" id="webNav3">À propos</div>
+                                                <div class="web-nav-btn" id="webNavBtn">Contact</div>
+                                            </div>
+                                        </div>
+                                        <div class="web-hero" id="webHero">
+                                            <h2 id="webHeroTitle">Transformez votre vision en réalité</h2>
+                                            <p id="webHeroText">La solution complète pour développer votre activité avec des outils modernes et performants</p>
+                                            <div class="web-cta" id="webCta">Commencer gratuitement</div>
+                                        </div>
+                                        <div class="web-features">
+                                            <div class="web-feature">
+                                                <div class="web-feature-icon" id="webIcon1">1</div>
+                                                <h3>Fonctionnalité 1</h3>
+                                                <p>Une solution innovante qui répond à vos besoins quotidiens avec efficacité</p>
+                                            </div>
+                                            <div class="web-feature">
+                                                <div class="web-feature-icon" id="webIcon2">2</div>
+                                                <h3>Fonctionnalité 2</h3>
+                                                <p>Des outils puissants pour maximiser votre productivité et vos résultats</p>
+                                            </div>
+                                            <div class="web-feature">
+                                                <div class="web-feature-icon" id="webIcon3">3</div>
+                                                <h3>Fonctionnalité 3</h3>
+                                                <p>Un support dédié pour vous accompagner à chaque étape de votre croissance</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Business Card Preview -->
+                                <div id="preview-card" class="preview-panel">
+                                    <div class="business-card-container">
+                                        <div class="business-card" id="businessCardFront">
+                                            <div class="bc-label">RECTO</div>
+                                            <div>
+                                                <div class="bc-logo" id="bcLogoFront">BRAND</div>
+                                            </div>
+                                            <div class="bc-info">
+                                                <div class="bc-name">Sophie Martin</div>
+                                                <div class="bc-title">Directrice Commerciale</div>
+                                            </div>
+                                        </div>
+                                        <div class="business-card" id="businessCardBack" style="background: #f3f4f6;">
+                                            <div class="bc-label" style="color: #6b7280;">VERSO</div>
+                                            <div style="flex: 1;"></div>
+                                            <div class="bc-info" style="color: #374151;">
+                                                <div class="bc-contact">
+                                                    <div>+33 6 12 34 56 78</div>
+                                                    <div>sophie.martin@entreprise.fr</div>
+                                                    <div>www.entreprise.fr</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Flyer Preview -->
+                                <div id="preview-flyer" class="preview-panel">
+                                    <div class="flyer-container">
+                                        <div class="flyer">
+                                            <div class="flyer-header" id="flyerHeader">
+                                                <div class="flyer-title" id="flyerTitle">ÉVÉNEMENT</div>
+                                                <div class="flyer-subtitle" id="flyerSubtitle">Une occasion unique à ne pas manquer</div>
+                                            </div>
+                                            <div class="flyer-body">
+                                                <div class="flyer-section" id="flyerSection1">
+                                                    <h3>À propos</h3>
+                                                    <p>Découvrez notre offre exclusive et profitez d'avantages exceptionnels</p>
+                                                </div>
+                                                <div class="flyer-section" id="flyerSection2">
+                                                    <h3>Informations pratiques</h3>
+                                                    <p>Rendez-vous le 15 janvier 2025 de 14h à 18h</p>
+                                                </div>
+                                            </div>
+                                            <div class="flyer-cta" id="flyerCta">Inscrivez-vous maintenant</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Logo Preview -->
+                                <div id="preview-logo" class="preview-panel">
+                                    <div class="logo-preview">
+                                        <div class="logo-main">
+                                            <div class="logo-circle" id="logoCircle">B</div>
+                                            <div class="logo-square" id="logoSquare">B</div>
+                                        </div>
+                                        <div class="logo-applications">
+                                            <div class="logo-app" id="logoApp1" data-label="Icon">B</div>
+                                            <div class="logo-app" id="logoApp2" data-label="Badge">B</div>
+                                            <div class="logo-app" id="logoApp3" data-label="Stamp">B</div>
+                                            <div class="logo-app" id="logoApp4" data-label="Mark">B</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Wall Preview -->
+                                <div id="preview-wall" class="preview-panel">
+                                    <div class="wall-preview">
+                                        <div class="wall-section" id="wall1">
+                                            <div class="wall-text">Section 1</div>
+                                        </div>
+                                        <div class="wall-section" id="wall2">
+                                            <div class="wall-text">Section 2</div>
+                                        </div>
+                                        <div class="wall-section" id="wall3">
+                                            <div class="wall-text">Section 3</div>
+                                        </div>
+                                        <div class="wall-section" id="wall4">
+                                            <div class="wall-text">Section 4</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Mobile Preview -->
+                                <div id="preview-mobile" class="preview-panel">
+                                    <div class="mobile-container">
+                                        <div class="mobile-preview">
+                                            <div class="mobile-statusbar" id="mobileStatus">
+                                                <span>9:41</span>
+                                                <span>100%</span>
+                                            </div>
+                                            <div class="mobile-header" id="mobileHeader">Mon App</div>
+                                            <div class="mobile-content">
+                                                <div class="mobile-card" id="mobileCard1">
+                                                    <div class="mobile-card-title">Première carte</div>
+                                                    <div class="mobile-card-text">Contenu de la première section avec informations importantes</div>
+                                                </div>
+                                                <div class="mobile-card" id="mobileCard2">
+                                                    <div class="mobile-card-title">Deuxième carte</div>
+                                                    <div class="mobile-card-text">Informations complémentaires et détails supplémentaires</div>
+                                                </div>
+                                                <div class="mobile-card" id="mobileCard3">
+                                                    <div class="mobile-card-title">Troisième carte</div>
+                                                    <div class="mobile-card-text">Dernière section avec call-to-action et engagement</div>
+                                                </div>
+                                            </div>
+                                            <div class="mobile-tab-bar">
+                                                <div class="mobile-tab" id="mobileTab1">1</div>
+                                                <div class="mobile-tab" id="mobileTab2">2</div>
+                                                <div class="mobile-tab" id="mobileTab3">3</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var currentPalette = [];
+
+        var contextInfo = {
+            'web': {
+                title: 'Web / Digital',
+                desc: 'Pour les sites web, applications et interfaces numériques',
+                tips: [
+                    'Contraste élevé pour la lisibilité (WCAG AA minimum)',
+                    'Couleur primaire pour CTAs et éléments interactifs',
+                    'Éviter trop de couleurs vives (fatigue visuelle)',
+                    'Penser mode sombre si applicable'
+                ]
+            },
+            'print': {
+                title: 'Print / Papier',
+                desc: 'Pour l\'impression (brochures, affiches, documents)',
+                tips: [
+                    'Utiliser CMYK plutôt que RGB pour l\'impression',
+                    'Attention aux couleurs trop claires (peuvent disparaître)',
+                    'Tester sur différents papiers (mat, brillant)',
+                    'Prévoir marge de sécurité pour découpe'
+                ]
+            },
+            'brand': {
+                title: 'Identité d\'Entreprise',
+                desc: 'Pour logo, charte graphique et communication corporate',
+                tips: [
+                    'Maximum 3 couleurs principales pour cohérence',
+                    'Définir variations pour différents supports',
+                    'Tester en noir et blanc pour polyvalence',
+                    'Documenter codes précis (Pantone si print)'
+                ]
+            },
+            'creative': {
+                title: 'Passion / Créatif',
+                desc: 'Pour projets artistiques et créatifs',
+                tips: [
+                    'Liberté totale sur audace des couleurs',
+                    'Contraste fort pour impact visuel',
+                    'Harmonies complexes acceptées',
+                    'Oser les couleurs saturées'
+                ]
+            },
+            'marketing': {
+                title: 'Marketing / Flyers',
+                desc: 'Pour supports promotionnels et publicitaires',
+                tips: [
+                    'Couleurs vives pour attirer l\'attention',
+                    'Hiérarchie visuelle claire',
+                    'Call-to-action bien visible (contraste)',
+                    'Éviter surcharge (max 3 couleurs fortes)'
+                ]
+            },
+            'architecture': {
+                title: 'Architecture / Espace',
+                desc: 'Pour aménagement d\'espaces et décoration',
+                tips: [
+                    'Couleurs apaisantes pour espaces de vie',
+                    'Couleurs énergisantes pour espaces de travail',
+                    'Tester échantillons avec éclairage réel',
+                    'Harmonies naturelles privilégiées'
+                ]
+            },
+            'fashion': {
+                title: 'Mode / Textile',
+                desc: 'Pour vêtements, accessoires et textiles',
+                tips: [
+                    'Penser saisons (couleurs chaudes/froides)',
+                    'Harmonies audacieuses acceptées',
+                    'Tester sur différentes matières',
+                    'Suivre ou créer tendances'
+                ]
+            },
+            'food': {
+                title: 'Food / Restaurant',
+                desc: 'Pour restaurants, produits alimentaires',
+                tips: [
+                    'Rouge/Orange stimulent l\'appétit',
+                    'Vert = fraîcheur, bio, santé',
+                    'Éviter bleu (peu naturel en alimentation)',
+                    'Couleurs chaudes privilégiées'
+                ]
+            },
+            'beauty': {
+                title: 'Beauté / Wellness',
+                desc: 'Pour cosmétiques, spa, bien-être',
+                tips: [
+                    'Pastels pour douceur et féminité',
+                    'Noir/Or pour luxe',
+                    'Blanc/Vert pour naturel',
+                    'Rose omniprésent mais éviter clichés'
+                ]
+            },
+            'tech': {
+                title: 'Gaming / Tech',
+                desc: 'Pour jeux vidéo, tech, innovation',
+                tips: [
+                    'Néons et couleurs vives pour gaming',
+                    'Bleu/Gris pour tech professionnel',
+                    'Dégradés modernes appréciés',
+                    'Mode sombre privilégié'
+                ]
+            }
+        };
+
+        // Incompatibilités couleurs/activités
+        var colorIncompatibilities = {
+            'luxury': {
+                avoid: ['trop de couleurs vives', 'couleurs criardes', 'rose bonbon', 'orange flashy'],
+                reason: 'Le luxe nécessite sobriété et élégance. Les couleurs trop vives donnent une impression cheap et low-cost, à l\'opposé du positionnement premium recherché.',
+                ideal: 'Noir, Or, Blanc, Gris anthracite, Bordeaux profond'
+            },
+            'tech': {
+                avoid: ['marron', 'beige', 'couleurs vintage', 'pastels trop doux'],
+                reason: 'La tech doit évoquer modernité et innovation. Les couleurs terre et vintage créent une perception de produit dépassé technologiquement.',
+                ideal: 'Bleu tech, Violet innovation, Noir, Blanc, Cyan'
+            },
+            'health': {
+                avoid: ['rouge vif', 'noir dominant', 'violet foncé', 'orange agressif'],
+                reason: 'La santé nécessite des couleurs rassurantes. Le rouge évoque urgence/sang, le noir peut angoisser les patients, créant stress plutôt que confiance.',
+                ideal: 'Bleu clair apaisant, Vert vitalité, Blanc hygiène'
+            },
+            'finance': {
+                avoid: ['rose', 'orange vif', 'couleurs ludiques', 'multicolore festif'],
+                reason: 'La finance exige sérieux et stabilité. Les couleurs ludiques donnent impression de manque de professionnalisme et fragilisent la confiance client.',
+                ideal: 'Bleu marine, Vert croissance, Gris, Noir corporate'
+            },
+            'education': {
+                avoid: ['noir dominant', 'couleurs trop sombres', 'monochrome strict'],
+                reason: 'L\'éducation doit stimuler et engager. Les couleurs sombres créent atmosphère déprimante, contraire à l\'apprentissage positif recherché.',
+                ideal: 'Bleu apprentissage, Jaune attention, Vert, Orange optimiste'
+            },
+            'ecology': {
+                avoid: ['couleurs synthétiques vives', 'rose flashy', 'bleu électrique', 'effets brillants'],
+                reason: 'L\'écologie demande authenticité naturelle. Les couleurs artificielles créent dissonance cognitive : message éco avec esthétique chimique.',
+                ideal: 'Verts naturels, Tons terre, Beige, Marron organique'
+            },
+            'sport': {
+                avoid: ['couleurs fades', 'pastels doux', 'beige/taupe', 'tons neutres'],
+                reason: 'Le sport nécessite énergie et dynamisme. Les couleurs douces évoquent passivité, à l\'opposé de la performance et l\'action recherchées.',
+                ideal: 'Rouge performance, Noir puissance, Orange énergie, Bleu intense'
+            },
+            'culture': {
+                avoid: ['couleurs trop corporate', 'limitation stricte', 'monochrome froid'],
+                reason: 'La culture célèbre créativité et expression. Une palette trop restrictive bride l\'identité artistique et semble manquer d\'audace.',
+                ideal: 'Liberté créative, Couleurs expressives selon positionnement'
+            },
+            'food': {
+                avoid: ['bleu', 'violet', 'gris', 'noir dominant'],
+                reason: 'L\'alimentation doit stimuler appétit. Le bleu/violet sont quasi-absents dans aliments naturels, créant répulsion instinctive (association poison/moisi).',
+                ideal: 'Rouge appétit, Orange/Jaune chaleur, Vert fraîcheur/bio'
+            },
+            'real-estate': {
+                avoid: ['couleurs criardes', 'rose/violet fantaisie', 'multicolore ludique'],
+                reason: 'L\'immobilier engage investissements majeurs. Les couleurs fantaisistes donnent impression de manque de sérieux, incompatible avec transactions importantes.',
+                ideal: 'Bleu confiance, Blanc espace, Vert investissement, Gris premium'
+            }
+        };
+
+        var colorPsychology = {
+            'red': { name: 'Rouge', emotion: 'Passion, Énergie, Urgence', uses: 'CTAs, Promotions, Food' },
+            'orange': { name: 'Orange', emotion: 'Créativité, Enthousiasme', uses: 'Jeunesse, Fun, Activité' },
+            'yellow': { name: 'Jaune', emotion: 'Optimisme, Chaleur', uses: 'Attention, Joie, Accessibilité' },
+            'green': { name: 'Vert', emotion: 'Nature, Croissance, Santé', uses: 'Écologie, Finance, Wellness' },
+            'blue': { name: 'Bleu', emotion: 'Confiance, Calme, Professionnalisme', uses: 'Corporate, Tech, Santé' },
+            'purple': { name: 'Violet', emotion: 'Luxe, Créativité, Spiritualité', uses: 'Beauté, Luxe, Innovation' },
+            'pink': { name: 'Rose', emotion: 'Douceur, Romance, Féminité', uses: 'Beauté, Mode, Cadeaux' },
+            'brown': { name: 'Marron', emotion: 'Naturel, Fiabilité, Terre', uses: 'Artisanat, Bio, Tradition' },
+            'black': { name: 'Noir', emotion: 'Luxe, Élégance, Pouvoir', uses: 'Mode, Luxe, Tech' },
+            'white': { name: 'Blanc', emotion: 'Pureté, Simplicité, Clarté', uses: 'Minimalisme, Santé, Tech' },
+            'gray': { name: 'Gris', emotion: 'Neutralité, Professionnalisme', uses: 'Corporate, Tech, Moderne' }
+        };
+
+        // Base de données Contexte × Activité
+        var industryRecommendations = {
+            // WEB / DIGITAL
+            'web-luxury': {
+                title: 'Web Luxe',
+                palette: ['#000000', '#C9A050', '#FFFFFF', '#2C2C2C', '#8B7355'],
+                trend: 'Minimalisme premium : Noir/Or avec espaces blancs généreux',
+                leaders: 'Hermès, Rolex, Porsche - Noir dominant + accents or',
+                works: '✓ Noir/Or/Blanc pour élégance, Typo serif fine, Animations subtiles',
+                avoid: '✗ Couleurs vives, Dégradés criards, Trop de contenu',
+                psychology: 'Noir = exclusivité, Or = prestige, Blanc = pureté'
+            },
+            'web-tech': {
+                title: 'Web Tech',
+                palette: ['#0066FF', '#00D9FF', '#1A1A1A', '#FFFFFF', '#7C3AED'],
+                trend: 'Néo-brutalisme 2025 : Bleu électrique + mode sombre + typographie bold',
+                leaders: 'Apple (gris), Microsoft (bleu), Vercel (noir/blanc)',
+                works: '✓ Bleu pour confiance, Violet pour innovation, Mode sombre obligatoire',
+                avoid: '✗ Couleurs ternes, Marron/beige, Trop de couleurs',
+                psychology: 'Bleu = fiabilité tech, Violet = futurisme, Noir = sophistication'
+            },
+            'web-health': {
+                title: 'Web Santé',
+                palette: ['#0EA5E9', '#10B981', '#FFFFFF', '#F0F9FF', '#1E40AF'],
+                trend: 'Bleu apaisant + vert santé, Design empathique et accessible',
+                leaders: 'Doctolib (bleu clair), Alan (bleu/vert), Qare (bleu)',
+                works: '✓ Bleu clair rassurant, Vert vitalité, Contraste WCAG AAA',
+                avoid: '✗ Rouge (urgence/sang), Noir pur, Couleurs agressives',
+                psychology: 'Bleu = confiance médicale, Vert = bien-être, Blanc = propreté'
+            },
+            'web-finance': {
+                title: 'Web Finance',
+                palette: ['#1E3A8A', '#059669', '#FFFFFF', '#F3F4F6', '#0F172A'],
+                trend: 'Bleu marine corporate + vert croissance, Dasboards data-driven',
+                leaders: 'PayPal (bleu), Stripe (violet), Revolut (noir/bleu)',
+                works: '✓ Bleu foncé sérieux, Vert positif (gains), Graphiques clairs',
+                avoid: '✗ Rouge (pertes), Orange (risque), Couleurs ludiques',
+                psychology: 'Bleu foncé = stabilité, Vert = profit, Gris = neutralité'
+            },
+            'web-education': {
+                title: 'Web Éducation',
+                palette: ['#3B82F6', '#F59E0B', '#FFFFFF', '#DBEAFE', '#7C3AED'],
+                trend: 'Couleurs primaires optimistes, Gamification, Illustrations',
+                leaders: 'Duolingo (vert), Coursera (bleu), Khan Academy (bleu/vert)',
+                works: '✓ Bleu apprentissage, Jaune attention, Violet créativité',
+                avoid: '✗ Couleurs sombres, Trop corporate, Monotonie',
+                psychology: 'Bleu = concentration, Jaune = stimulation, Violet = imagination'
+            },
+            'web-ecology': {
+                title: 'Web Écologie',
+                palette: ['#059669', '#16A34A', '#F0FDF4', '#65A30D', '#84CC16'],
+                trend: 'Palette terre : Verts naturels + beiges organiques, Éco-design sobre',
+                leaders: 'Patagonia (vert foncé), Veja (vert/beige), Too Good To Go (vert)',
+                works: '✓ Verts variés, Tons terre, Beige naturel, Design minimaliste',
+                avoid: '✗ Synthétiques vifs, Noir pur, Effets lourds (énergie)',
+                psychology: 'Vert = nature, Beige = organique, Marron = terre'
+            },
+            'web-sport': {
+                title: 'Web Sport',
+                palette: ['#EF4444', '#0EA5E9', '#000000', '#FFFFFF', '#F97316'],
+                trend: 'Couleurs énergiques : Rouge/Orange dynamiques + noir performance',
+                leaders: 'Nike (noir/rouge), Adidas (noir), Decathlon (bleu)',
+                works: '✓ Rouge énergie, Orange motivation, Noir performance',
+                avoid: '✗ Pastels, Couleurs ternes, Trop de douceur',
+                psychology: 'Rouge = action, Noir = puissance, Orange = endurance'
+            },
+            'web-culture': {
+                title: 'Web Culture',
+                palette: ['#7C3AED', '#EC4899', '#0EA5E9', '#F59E0B', '#FFFFFF'],
+                trend: 'Audace chromatique : Palettes variées, Dégradés vibrants',
+                leaders: 'Spotify (vert), Netflix (rouge/noir), Artsy (noir/blanc)',
+                works: '✓ Couleurs expressives, Dégradés, Typographie créative',
+                avoid: '✗ Trop corporate, Monochrome strict, Froideur',
+                psychology: 'Variété = créativité, Couleurs vives = passion culturelle'
+            },
+            'web-food': {
+                title: 'Web Food',
+                palette: ['#DC2626', '#F97316', '#FEF3C7', '#16A34A', '#FFFFFF'],
+                trend: 'Chaud appétissant : Rouge/Orange + photos qualité, Dark mode foodie',
+                leaders: 'Uber Eats (vert), Deliveroo (bleu canard), Just Eat (orange)',
+                works: '✓ Rouge/orange appétit, Vert fraîcheur, Photos centrales',
+                avoid: '✗ Bleu (tue appétit), Gris, Couleurs froides',
+                psychology: 'Rouge = faim, Orange = gourmandise, Vert = frais/bio'
+            },
+            'web-real-estate': {
+                title: 'Web Immobilier',
+                palette: ['#1E40AF', '#FFFFFF', '#F3F4F6', '#059669', '#0F172A'],
+                trend: 'Bleu confiance + blanc espace, Photos immersives, 3D/VR',
+                leaders: 'SeLoger (orange), Leboncoin (orange), Airbnb (rose/blanc)',
+                works: '✓ Bleu sérieux, Blanc espace, Photos HD dominantes',
+                avoid: '✗ Couleurs sombres (claustrophobie), Rouge agressif',
+                psychology: 'Bleu = confiance achat, Blanc = espace, Vert = investissement'
+            },
+
+            // PRINT / PAPIER
+            'print-luxury': {
+                title: 'Print Luxe',
+                palette: ['#000000', '#C9A050', '#FFFFFF', '#2C2C2C', '#8B7355'],
+                trend: 'Dorure à chaud + papier premium, Pantone Or 871 C, Vernis sélectif',
+                leaders: 'Chanel (noir/blanc/or), Louis Vuitton (marron/or), Dior (gris perle)',
+                works: '✓ Pantone métalliques, Papier texturé (coton), Finitions premium',
+                avoid: '✗ Offset standard, Couleurs CMYK basiques, Papier brillant cheap',
+                psychology: 'Noir mat + or chaud = luxe absolu, Toucher papier = qualité'
+            },
+            'print-tech': {
+                title: 'Print Tech',
+                palette: ['#3B82F6', '#000000', '#FFFFFF', '#6366F1', '#0EA5E9'],
+                trend: 'Minimalisme data : Infographies bleu/noir, Papier blanc premium',
+                leaders: 'Apple (blanc minimal), Google (couleurs vives), IBM (bleu)',
+                works: '✓ Bleu tech, Infographies claires, QR codes intégrés',
+                avoid: '✗ Papier recyclé low-cost, Trop de texte, Couleurs fades',
+                psychology: 'Bleu = innovation, Blanc = clarté, Noir = premium'
+            },
+            'print-health': {
+                title: 'Print Santé',
+                palette: ['#0EA5E9', '#FFFFFF', '#F0F9FF', '#10B981', '#1E40AF'],
+                trend: 'Bleu médical rassurant, Papier mat anti-reflet, Pictogrammes clairs',
+                leaders: 'Pharmacies (vert croix), Hôpitaux (bleu clair), Labos (bleu foncé)',
+                works: '✓ Bleu apaisant, Typographie lisible (seniors), Contraste fort',
+                avoid: '✗ Rouge alarmant, Noir angoissant, Papier brillant (éblouissement)',
+                psychology: 'Bleu clair = hygiène, Vert = santé, Blanc = stérilité rassurante'
+            },
+            'print-finance': {
+                title: 'Print Finance',
+                palette: ['#1E3A8A', '#059669', '#FFFFFF', '#0F172A', '#D1D5DB'],
+                trend: 'Bleu corporate + vert croissance, Papier vergé haut de gamme',
+                leaders: 'Banques (bleu marine), Assurances (bleu/vert), Conseils (gris/bleu)',
+                works: '✓ Bleu autorité, Graphiques financiers, Papier épais (confiance)',
+                avoid: '✗ Couleurs fantaisistes, Comic Sans, Papier fin cheap',
+                psychology: 'Bleu marine = sérieux, Vert = rentabilité, Gris = sobriété'
+            },
+            'print-education': {
+                title: 'Print Éducation',
+                palette: ['#3B82F6', '#F59E0B', '#FFFFFF', '#7C3AED', '#10B981'],
+                trend: 'Couleurs pédagogiques vives, Illustrations engageantes, Papier recyclé',
+                leaders: 'Manuels scolaires (multicolore), CNED (bleu/orange), CROUS (bleu)',
+                works: '✓ Code couleur par matière, Illustrations claires, Papier durable',
+                avoid: '✗ Monochrome ennuyeux, Papier glacé (fatigue yeux), Trop dense',
+                psychology: 'Couleurs variées = stimulation, Jaune = attention, Bleu = apprentissage'
+            },
+            'print-ecology': {
+                title: 'Print Écologie',
+                palette: ['#16A34A', '#65A30D', '#F0FDF4', '#78350F', '#D6D3D1'],
+                trend: 'Tons terre + papier recyclé certifié, Encres végétales, Éco-conception',
+                leaders: 'WWF (vert/noir), Greenpeace (vert), Bio marques (vert/beige)',
+                works: '✓ Vert nature, Beige kraft, Papier recyclé visible, Labels éco',
+                avoid: '✗ Papier glacé, Couleurs synthétiques, Sur-impression',
+                psychology: 'Vert = engagement, Beige = naturel, Papier recyclé = cohérence'
+            },
+            'print-sport': {
+                title: 'Print Sport',
+                palette: ['#DC2626', '#000000', '#FFFFFF', '#F97316', '#0EA5E9'],
+                trend: 'Couleurs impact : Rouge/Noir énergiques, Typographie bold, Finition mat',
+                leaders: 'Nike (noir/rouge), Adidas (noir), Under Armour (noir/rouge)',
+                works: '✓ Rouge motivation, Noir puissance, Photos action dynamiques',
+                avoid: '✗ Couleurs fades, Typographie fine, Papier fragile',
+                psychology: 'Rouge = performance, Noir = excellence, Contraste = impact'
+            },
+            'print-culture': {
+                title: 'Print Culture',
+                palette: ['#7C3AED', '#EC4899', '#000000', '#FFFFFF', '#F59E0B'],
+                trend: 'Liberté créative totale, Pantone spéciaux, Formats non-standards',
+                leaders: 'Musées (variés), Festivals (audacieux), Galeries (noir/blanc ou couleur)',
+                works: '✓ Audace chromatique, Typo expressive, Papiers créatifs',
+                avoid: '✗ Trop sage, Formats standards uniquement, Manque personnalité',
+                psychology: 'Couleurs expressives = créativité, Variété = richesse culturelle'
+            },
+            'print-food': {
+                title: 'Print Food',
+                palette: ['#DC2626', '#F97316', '#FEF3C7', '#16A34A', '#78350F'],
+                trend: 'Chaud appétissant : Rouge/Orange, Photos HD food, Papier couché brillant',
+                leaders: 'McDonald\'s (rouge/jaune), Starbucks (vert), Restaurants (rouge/noir)',
+                works: '✓ Rouge appétit, Jaune gourmandise, Photos qualité HD',
+                avoid: '✗ Bleu (anti-appétit), Gris, Photos faibles, Papier mat (photos ternes)',
+                psychology: 'Rouge/orange = faim, Jaune = chaleur, Vert = fraîcheur/bio'
+            },
+            'print-real-estate': {
+                title: 'Print Immobilier',
+                palette: ['#1E40AF', '#FFFFFF', '#059669', '#0F172A', '#D1D5DB'],
+                trend: 'Bleu premium + photos immersives, Papier épais qualité, Plans clairs',
+                leaders: 'Agences (bleu/blanc), Promoteurs (vert/bleu), Notaires (bleu marine)',
+                works: '✓ Bleu confiance, Photos HD dominantes, Plans architecte qualité',
+                avoid: '✗ Couleurs cheap, Photos pixelisées, Papier fin',
+                psychology: 'Bleu = sérieux transaction, Blanc = espace lumière, Vert = investissement'
+            },
+
+            // IDENTITÉ ENTREPRISE
+            'brand-luxury': {
+                title: 'Branding Luxe',
+                palette: ['#000000', '#C9A050', '#FFFFFF', '#2C2C2C', '#8B7355'],
+                trend: 'Noir absolu + or noble, Logo minimaliste, Pantone métalliques exclusifs',
+                leaders: 'Hermès (orange Pantone exclusif), Chanel (noir/blanc), Cartier (rouge)',
+                works: '✓ Max 2 couleurs, Noir/Or intemporel, Pantone propriétaire',
+                avoid: '✗ Dégradés, Couleurs vives, Plus de 3 couleurs',
+                psychology: 'Noir = exclusivité absolue, Or = patrimoine, Simplicité = élégance'
+            },
+            'brand-tech': {
+                title: 'Branding Tech',
+                palette: ['#0066FF', '#000000', '#FFFFFF', '#7C3AED', '#00D9FF'],
+                trend: 'Bleu innovation + violet futuriste, Logos géométriques, Adaptabilité digitale',
+                leaders: 'Meta (bleu), Apple (gris), Stripe (violet), Twitter/X (noir)',
+                works: '✓ Bleu tech, Simplicité scalable, Versions dark/light',
+                avoid: '✗ Trop de détails, Couleurs vintage, Complexité',
+                psychology: 'Bleu = fiabilité, Violet = innovation, Noir = disruption'
+            },
+            'brand-health': {
+                title: 'Branding Santé',
+                palette: ['#0EA5E9', '#10B981', '#FFFFFF', '#1E40AF', '#F0F9FF'],
+                trend: 'Bleu médical + vert vitalité, Symboles santé reconnaissables',
+                leaders: 'Doctolib (bleu), Pfizer (bleu), Johnson&Johnson (rouge)',
+                works: '✓ Bleu rassurant, Vert positif, Symboles universels (croix, cœur)',
+                avoid: '✗ Rouge alarmant, Noir anxiogène, Complexité visuelle',
+                psychology: 'Bleu = confiance médicale, Vert = bien-être, Blanc = hygiène'
+            },
+            'brand-finance': {
+                title: 'Branding Finance',
+                palette: ['#1E3A8A', '#059669', '#000000', '#FFFFFF', '#0F172A'],
+                trend: 'Bleu marine autorité, Vert croissance, Logo intemporel et sérieux',
+                leaders: 'Mastercard (rouge/orange), Visa (bleu/or), AmEx (bleu), PayPal (bleu)',
+                works: '✓ Bleu foncé stabilité, Vert profit, Max 2 couleurs principales',
+                avoid: '✗ Rose/Orange ludique, Trop de couleurs, Typo fantaisie',
+                psychology: 'Bleu marine = sécurité argent, Vert = prospérité, Stabilité visuelle = confiance'
+            },
+            'brand-education': {
+                title: 'Branding Éducation',
+                palette: ['#3B82F6', '#F59E0B', '#7C3AED', '#10B981', '#FFFFFF'],
+                trend: 'Bleu apprentissage + couleurs optimistes, Logo accessible et friendly',
+                leaders: 'Harvard (rouge), Oxford (bleu), Sorbonne (bleu), EdTech (multicolore)',
+                works: '✓ Bleu autorité, Couleurs stimulantes, Symboles académiques',
+                avoid: '✗ Trop sombre, Agressif, Élitiste visuellement',
+                psychology: 'Bleu = savoir, Couleurs variées = disciplines variées, Ouverture visuelle'
+            },
+            'brand-ecology': {
+                title: 'Branding Écologie',
+                palette: ['#16A34A', '#65A30D', '#78350F', '#F0FDF4', '#D6D3D1'],
+                trend: 'Verts naturels + tons terre, Logo organique, Certification visible',
+                leaders: 'Patagonia (vert foncé), Bio labels (vert), The Body Shop (vert)',
+                works: '✓ Vert engagement, Formes organiques, Labels éco intégrés',
+                avoid: '✗ Synthétique vif, Noir corporate, Complexité',
+                psychology: 'Vert = nature action, Beige = authenticité, Formes courbes = organique'
+            },
+            'brand-sport': {
+                title: 'Branding Sport',
+                palette: ['#000000', '#DC2626', '#FFFFFF', '#F97316', '#0EA5E9'],
+                trend: 'Noir excellence + rouge performance, Logo iconique simple, Swoosh-like',
+                leaders: 'Nike (swoosh noir), Adidas (3 bandes), Puma (noir), Under Armour',
+                works: '✓ Noir dominant, Rouge accent, Symbole mémorable, Scalabilité',
+                avoid: '✗ Couleurs fades, Détails complexes, Pastel',
+                psychology: 'Noir = performance, Rouge = victoire, Symbole = appartenance'
+            },
+            'brand-culture': {
+                title: 'Branding Culture',
+                palette: ['#7C3AED', '#EC4899', '#000000', '#FFFFFF', '#F59E0B'],
+                trend: 'Liberté créative : Couleurs signature audacieuses, Logo expressif unique',
+                leaders: 'MoMA (noir/blanc), Centre Pompidou (couleurs primaires), Tate (vert)',
+                works: '✓ Couleur signature unique, Créativité assumée, Mémorabilité',
+                avoid: '✗ Générique, Trop corporate, Suivisme',
+                psychology: 'Couleur signature = identité forte, Audace = créativité'
+            },
+            'brand-food': {
+                title: 'Branding Food',
+                palette: ['#DC2626', '#F59E0B', '#16A34A', '#FFFFFF', '#78350F'],
+                trend: 'Rouge appétit + jaune chaleur, Logo gourmand, Couleurs chaudes dominantes',
+                leaders: 'McDonald\'s (rouge/jaune), KFC (rouge), Coca (rouge), Starbucks (vert)',
+                works: '✓ Rouge/jaune faim, Vert fraîcheur/bio, Logo simple mémorable',
+                avoid: '✗ Bleu (tue appétit), Violet, Gris froid',
+                psychology: 'Rouge = appétit immédiat, Jaune = convivialité, Vert = santé/bio'
+            },
+            'brand-real-estate': {
+                title: 'Branding Immobilier',
+                palette: ['#1E40AF', '#059669', '#000000', '#FFFFFF', '#0F172A'],
+                trend: 'Bleu confiance + vert investissement, Logo architecturé, Sérieux premium',
+                leaders: 'Century 21 (or/noir), Foncia (bleu), Nexity (bleu/vert)',
+                works: '✓ Bleu autorité, Formes géométriques (toit, immeuble), Stabilité',
+                avoid: '✗ Rose/Orange ludique, Formes molles, Trop créatif',
+                psychology: 'Bleu = confiance transaction, Vert = investissement croissance, Géométrie = solidité'
+            }
+
+            // Continuer pour CREATIVE, MARKETING, ARCHITECTURE, FASHION, BEAUTY, TECH...
+            // (Ajout des autres contextes suivant même pattern)
+        };
+
+        function updateContextInfo() {
+            var context = document.getElementById('context').value;
+            var industry = document.getElementById('industry').value;
+            var info = contextInfo[context];
+            
+            var html = `
+                <h3>${info.title}</h3>
+                <p style="margin: 10px 0;">${info.desc}</p>
+                <p style="font-weight: 600; margin-top: 15px;">Bonnes pratiques :</p>
+                <ul style="margin-left: 20px; color: #1e3a8a;">
+                    ${info.tips.map(tip => `<li style="margin: 5px 0;">${tip}</li>`).join('')}
+                </ul>
+            `;
+            
+            // Ajouter info incompatibilités pour l'activité
+            var incompatibility = colorIncompatibilities[industry];
+            if (incompatibility) {
+                html += `
+                    <div style="margin-top: 20px; padding: 15px; background: #fef3c7; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                        <h4 style="color: #92400e; margin-bottom: 10px;">ATTENTION - Couleurs à éviter pour ${getIndustryName(industry)}</h4>
+                        
+                        <div style="margin: 10px 0;">
+                            <strong style="color: #dc2626;">À ÉVITER :</strong>
+                            <p style="margin: 5px 0 5px 15px; color: #991b1b; font-size: 0.9em;">${incompatibility.avoid.join(', ')}</p>
+                        </div>
+                        
+                        <div style="margin: 10px 0;">
+                            <strong style="color: #7c3aed;">POURQUOI :</strong>
+                            <p style="margin: 5px 0 5px 15px; color: #5b21b6; font-size: 0.9em;">${incompatibility.reason}</p>
+                        </div>
+                        
+                        <div style="margin: 10px 0;">
+                            <strong style="color: #059669;">IDÉAL :</strong>
+                            <p style="margin: 5px 0 5px 15px; color: #065f46; font-size: 0.9em;">${incompatibility.ideal}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Chercher recommandations spécifiques
+            var recKey = context + '-' + industry;
+            var recommendation = industryRecommendations[recKey];
+            
+            // Si recommandations secteur trouvées
+            if (recommendation) {
+                html += `
+                    <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px; border: 2px solid #3b82f6;">
+                        <h4 style="color: #1e40af; margin-bottom: 10px;">${recommendation.title} - Tendances 2025</h4>
+                        
+                        <div style="margin: 10px 0;">
+                            <strong style="color: #059669;">CE QUI FONCTIONNE :</strong>
+                            <p style="margin: 5px 0 5px 15px; color: #065f46; font-size: 0.9em;">${recommendation.works}</p>
+                        </div>
+                        
+                        <div style="margin: 10px 0;">
+                            <strong style="color: #dc2626;">À ÉVITER :</strong>
+                            <p style="margin: 5px 0 5px 15px; color: #991b1b; font-size: 0.9em;">${recommendation.avoid}</p>
+                        </div>
+                        
+                        <div style="margin: 10px 0;">
+                            <strong style="color: #7c3aed;">TENDANCE ACTUELLE :</strong>
+                            <p style="margin: 5px 0 5px 15px; color: #5b21b6; font-size: 0.9em;">${recommendation.trend}</p>
+                        </div>
+                        
+                        <div style="margin: 10px 0;">
+                            <strong style="color: #0ea5e9;">RÉFÉRENCES MARCHÉ :</strong>
+                            <p style="margin: 5px 0 5px 15px; color: #0369a1; font-size: 0.9em;">${recommendation.leaders}</p>
+                        </div>
+                        
+                        <div style="margin: 10px 0;">
+                            <strong style="color: #f59e0b;">PSYCHOLOGIE :</strong>
+                            <p style="margin: 5px 0 5px 15px; color: #92400e; font-size: 0.9em;">${recommendation.psychology}</p>
+                        </div>
+                        
+                        <div style="margin-top: 15px; padding: 10px; background: #f0f9ff; border-radius: 6px;">
+                            <p style="font-weight: 600; color: #0369a1; margin-bottom: 8px;">Palette recommandée pour ce secteur :</p>
+                            <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+                                ${recommendation.palette.map(color => `
+                                    <div style="width: 40px; height: 40px; background: ${color}; border-radius: 4px; border: 1px solid #d1d5db;" title="${color}"></div>
+                                `).join('')}
+                            </div>
+                            <button onclick="applySectorPalette('${recKey}')" style="width: 100%; padding: 10px; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                                Appliquer cette palette recommandée
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('contextInfo').innerHTML = html;
+            
+            // Vérifier incompatibilités après génération de palette
+            if (currentPalette.length > 0) {
+                checkPaletteCompatibility();
+            }
+        }
+        
+        function getIndustryName(industry) {
+            var names = {
+                'luxury': 'Luxe',
+                'tech': 'Tech',
+                'health': 'Santé',
+                'finance': 'Finance',
+                'education': 'Éducation',
+                'ecology': 'Écologie',
+                'sport': 'Sport',
+                'culture': 'Culture',
+                'food': 'Alimentation',
+                'real-estate': 'Immobilier'
+            };
+            return names[industry] || industry;
+        }
+        
+        function checkPaletteCompatibility() {
+            var industry = document.getElementById('industry').value;
+            var incompatibility = colorIncompatibilities[industry];
+            
+            if (!incompatibility || currentPalette.length === 0) return;
+            
+            var warnings = [];
+            var primaryColor = currentPalette[2] || currentPalette[0];
+            var rgb = hexToRgb(primaryColor);
+            var hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            
+            // Vérifications spécifiques par industrie
+            if (industry === 'food') {
+                if (hsl.h >= 200 && hsl.h <= 280) {
+                    warnings.push('ATTENTION : Votre palette contient du bleu/violet. Ces couleurs inhibent l\'appétit et sont déconseillées pour l\'alimentation.');
+                }
+            }
+            
+            if (industry === 'luxury') {
+                var hasBrightColors = currentPalette.some(function(color) {
+                    var rgb = hexToRgb(color);
+                    var hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                    return hsl.s > 80 && hsl.l > 60;
+                });
+                if (hasBrightColors) {
+                    warnings.push('ATTENTION : Couleurs trop vives détectées. Le luxe nécessite sobriété (noir/or/blanc/gris).');
+                }
+            }
+            
+            if (industry === 'health') {
+                if (hsl.h >= 345 || hsl.h <= 15) {
+                    if (hsl.s > 60) {
+                        warnings.push('ATTENTION : Rouge vif détecté. Évoque urgence/sang et peut angoisser patients. Privilégiez bleu apaisant.');
+                    }
+                }
+            }
+            
+            if (industry === 'finance') {
+                if ((hsl.h >= 280 && hsl.h <= 340) || (hsl.h >= 10 && hsl.h <= 40)) {
+                    if (hsl.s > 70) {
+                        warnings.push('ATTENTION : Couleurs ludiques (rose/orange) détectées. La finance nécessite sérieux (bleu marine/vert/gris).');
+                    }
+                }
+            }
+            
+            if (industry === 'ecology') {
+                if (hsl.s > 85 && (hsl.h < 60 || hsl.h > 180)) {
+                    warnings.push('ATTENTION : Couleurs synthétiques vives détectées. L\'écologie demande tons naturels (verts/terre/beige).');
+                }
+            }
+            
+            if (industry === 'tech') {
+                if (hsl.h >= 20 && hsl.h <= 40 && hsl.s < 40) {
+                    warnings.push('ATTENTION : Marron/Beige détecté. Évoque vintage, pas innovation tech. Privilégiez bleu/violet/noir.');
+                }
+            }
+            
+            if (industry === 'sport') {
+                var allMuted = currentPalette.every(function(color) {
+                    var rgb = hexToRgb(color);
+                    var hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                    return hsl.s < 40 || hsl.l > 70;
+                });
+                if (allMuted) {
+                    warnings.push('ATTENTION : Palette trop douce détectée. Le sport nécessite énergie (rouge/noir/orange vifs).');
+                }
+            }
+            
+            // Afficher warnings si présents
+            if (warnings.length > 0) {
+                var warningHtml = `
+                    <div style="margin-top: 20px; padding: 15px; background: #fee2e2; border-radius: 8px; border-left: 4px solid #dc2626;">
+                        <h4 style="color: #991b1b; margin-bottom: 10px;">ALERTE INCOMPATIBILITÉ</h4>
+                        ${warnings.map(w => `<p style="color: #7f1d1d; margin: 8px 0; font-weight: 500;">${w}</p>`).join('')}
+                    </div>
+                `;
+                
+                var psychoDiv = document.getElementById('psychologyInfo');
+                if (psychoDiv.innerHTML.includes('ALERTE INCOMPATIBILITÉ')) {
+                    // Remplacer l'alerte existante
+                    psychoDiv.innerHTML = psychoDiv.innerHTML.replace(/<div style="margin-top: 20px;[^>]*ALERTE INCOMPATIBILITÉ[\s\S]*?<\/div>/, warningHtml);
+                } else {
+                    psychoDiv.innerHTML += warningHtml;
+                }
+            }
+        }
+        
+        function applySectorPalette(recKey) {
+            var recommendation = industryRecommendations[recKey];
+            if (recommendation && recommendation.palette) {
+                currentPalette = recommendation.palette;
+                displayPalette(recommendation.palette);
+                updatePreviews(recommendation.palette);
+            }
+        }
+
+        function hexToRgb(hex) {
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            var max = Math.max(r, g, b), min = Math.min(r, g, b);
+            var h, s, l = (max + min) / 2;
+
+            if (max == min) {
+                h = s = 0;
+            } else {
+                var d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return { h: h * 360, s: s * 100, l: l * 100 };
+        }
+
+        function hslToRgb(h, s, l) {
+            h /= 360; s /= 100; l /= 100;
+            var r, g, b;
+
+            if (s == 0) {
+                r = g = b = l;
+            } else {
+                var hue2rgb = function(p, q, t) {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+                var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                var p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+            }
+            return {
+                r: Math.round(r * 255),
+                g: Math.round(g * 255),
+                b: Math.round(b * 255)
+            };
+        }
+
+        function generatePalette() {
+            var baseColor = document.getElementById('baseColor').value;
+            var harmony = document.querySelector('input[name="harmony"]:checked').value;
+            
+            var rgb = hexToRgb(baseColor);
+            var hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            
+            var colors = [];
+            
+            switch(harmony) {
+                case 'monochromatic':
+                    colors = generateMonochromatic(hsl);
+                    break;
+                case 'analogous':
+                    colors = generateAnalogous(hsl);
+                    break;
+                case 'complementary':
+                    colors = generateComplementary(hsl);
+                    break;
+                case 'triadic':
+                    colors = generateTriadic(hsl);
+                    break;
+                case 'tetradic':
+                    colors = generateTetradic(hsl);
+                    break;
+            }
+            
+            currentPalette = colors;
+            displayPalette(colors);
+            updatePreviews(colors);
+            checkPaletteCompatibility();
+        }
+
+        function generateMonochromatic(hsl) {
+            return [
+                hslToHex(hsl.h, hsl.s, Math.min(hsl.l + 30, 95)),
+                hslToHex(hsl.h, hsl.s, Math.min(hsl.l + 15, 90)),
+                hslToHex(hsl.h, hsl.s, hsl.l),
+                hslToHex(hsl.h, hsl.s, Math.max(hsl.l - 15, 10)),
+                hslToHex(hsl.h, hsl.s, Math.max(hsl.l - 30, 5))
+            ];
+        }
+
+        function generateAnalogous(hsl) {
+            return [
+                hslToHex((hsl.h - 30 + 360) % 360, hsl.s, hsl.l),
+                hslToHex((hsl.h - 15 + 360) % 360, hsl.s, hsl.l),
+                hslToHex(hsl.h, hsl.s, hsl.l),
+                hslToHex((hsl.h + 15) % 360, hsl.s, hsl.l),
+                hslToHex((hsl.h + 30) % 360, hsl.s, hsl.l)
+            ];
+        }
+
+        function generateComplementary(hsl) {
+            var comp = (hsl.h + 180) % 360;
+            return [
+                hslToHex(hsl.h, hsl.s, Math.min(hsl.l + 20, 90)),
+                hslToHex(hsl.h, hsl.s, hsl.l),
+                hslToHex(hsl.h, hsl.s, Math.max(hsl.l - 20, 10)),
+                hslToHex(comp, hsl.s, hsl.l),
+                hslToHex(comp, hsl.s, Math.max(hsl.l - 20, 10))
+            ];
+        }
+
+        function generateTriadic(hsl) {
+            return [
+                hslToHex(hsl.h, hsl.s, hsl.l),
+                hslToHex((hsl.h + 120) % 360, hsl.s, hsl.l),
+                hslToHex((hsl.h + 240) % 360, hsl.s, hsl.l),
+                hslToHex(hsl.h, hsl.s, Math.max(hsl.l - 20, 10)),
+                hslToHex((hsl.h + 120) % 360, hsl.s, Math.max(hsl.l - 20, 10))
+            ];
+        }
+
+        function generateTetradic(hsl) {
+            return [
+                hslToHex(hsl.h, hsl.s, hsl.l),
+                hslToHex((hsl.h + 90) % 360, hsl.s, hsl.l),
+                hslToHex((hsl.h + 180) % 360, hsl.s, hsl.l),
+                hslToHex((hsl.h + 270) % 360, hsl.s, hsl.l),
+                hslToHex(hsl.h, hsl.s, Math.max(hsl.l - 20, 10))
+            ];
+        }
+
+        function hslToHex(h, s, l) {
+            var rgb = hslToRgb(h, s, l);
+            return rgbToHex(rgb.r, rgb.g, rgb.b);
+        }
+
+        function displayPalette(colors) {
+            var html = '';
+            
+            colors.forEach(function(color, index) {
+                var rgb = hexToRgb(color);
+                var hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                
+                html += `
+                    <div class="color-card" onclick="copyColor('${color}', ${index})">
+                        <div class="color-swatch" style="background: ${color};">
+                            <div class="copy-indicator" id="copy-${index}">Copié !</div>
+                        </div>
+                        <div class="color-info">
+                            <div class="color-name">Couleur ${index + 1}</div>
+                            <div class="color-codes">
+                                <div>HEX: ${color}</div>
+                                <div>RGB: ${rgb.r}, ${rgb.g}, ${rgb.b}</div>
+                                <div>HSL: ${Math.round(hsl.h)}°, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('paletteColors').innerHTML = html;
+            
+            // Psychologie
+            var baseRgb = hexToRgb(colors[2] || colors[0]);
+            var baseHsl = rgbToHsl(baseRgb.r, baseRgb.g, baseRgb.b);
+            displayPsychology(baseHsl.h);
+        }
+
+        function displayPsychology(hue) {
+            var category = getColorCategory(hue);
+            var info = colorPsychology[category];
+            
+            var html = `
+                <div class="info-box" style="margin-top: 30px;">
+                    <h3>Psychologie de la couleur</h3>
+                    <div class="psychology-grid">
+                        <div class="psychology-item" style="border-color: ${getCategoryColor(category)};">
+                            <h4>${info.name}</h4>
+                            <p><strong>Émotions:</strong> ${info.emotion}</p>
+                            <p><strong>Idéal pour:</strong> ${info.uses}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('psychologyInfo').innerHTML = html;
+        }
+
+        function getColorCategory(hue) {
+            if (hue >= 345 || hue < 15) return 'red';
+            if (hue >= 15 && hue < 45) return 'orange';
+            if (hue >= 45 && hue < 75) return 'yellow';
+            if (hue >= 75 && hue < 165) return 'green';
+            if (hue >= 165 && hue < 255) return 'blue';
+            if (hue >= 255 && hue < 285) return 'purple';
+            if (hue >= 285 && hue < 345) return 'pink';
+            return 'blue';
+        }
+
+        function getCategoryColor(category) {
+            var colors = {
+                'red': '#dc2626',
+                'orange': '#f97316',
+                'yellow': '#f59e0b',
+                'green': '#22c55e',
+                'blue': '#3b82f6',
+                'purple': '#a855f7',
+                'pink': '#ec4899',
+                'brown': '#92400e',
+                'black': '#1f2937',
+                'white': '#ffffff',
+                'gray': '#6b7280'
+            };
+            return colors[category] || '#3b82f6';
+        }
+
+        function copyColor(color, index) {
+            navigator.clipboard.writeText(color);
+            var indicator = document.getElementById('copy-' + index);
+            indicator.classList.add('show');
+            setTimeout(function() {
+                indicator.classList.remove('show');
+            }, 1500);
+        }
+
+        function updatePreviews(colors) {
+            var primary = colors[2] || colors[0];
+            var secondary = colors[1] || colors[0];
+            var accent = colors[3] || colors[0];
+            var light = colors[0] || '#ffffff';
+            var dark = colors[4] || '#000000';
+            
+            // Website
+            document.getElementById('webHeader').style.background = 'white';
+            document.getElementById('webHeader').style.color = dark;
+            document.getElementById('webHeader').style.borderBottomColor = secondary + '20';
+            document.getElementById('webLogo').style.color = primary;
+            document.getElementById('webNavBtn').style.background = primary;
+            document.getElementById('webNavBtn').style.color = getContrastColor(primary);
+            document.getElementById('webHero').style.background = light;
+            document.getElementById('webHero').style.color = dark;
+            document.getElementById('webCta').style.background = primary;
+            document.getElementById('webCta').style.color = getContrastColor(primary);
+            document.getElementById('webIcon1').style.background = primary + '20';
+            document.getElementById('webIcon1').style.color = primary;
+            document.getElementById('webIcon2').style.background = secondary + '20';
+            document.getElementById('webIcon2').style.color = secondary;
+            document.getElementById('webIcon3').style.background = accent + '20';
+            document.getElementById('webIcon3').style.color = accent;
+            
+            // Business Card Front
+            document.getElementById('businessCardFront').style.background = primary;
+            document.getElementById('businessCardFront').style.color = getContrastColor(primary);
+            document.getElementById('bcLogoFront').style.color = accent;
+            
+            // Flyer
+            document.getElementById('flyerHeader').style.background = primary;
+            document.getElementById('flyerHeader').style.color = getContrastColor(primary);
+            document.getElementById('flyerSection1').style.background = light;
+            document.getElementById('flyerSection1').style.color = dark;
+            document.getElementById('flyerSection2').style.background = secondary;
+            document.getElementById('flyerSection2').style.color = getContrastColor(secondary);
+            document.getElementById('flyerCta').style.background = accent;
+            document.getElementById('flyerCta').style.color = getContrastColor(accent);
+            
+            // Logo
+            document.getElementById('logoCircle').style.background = primary;
+            document.getElementById('logoCircle').style.color = getContrastColor(primary);
+            document.getElementById('logoSquare').style.background = secondary;
+            document.getElementById('logoSquare').style.color = getContrastColor(secondary);
+            document.getElementById('logoApp1').style.background = primary;
+            document.getElementById('logoApp1').style.color = getContrastColor(primary);
+            document.getElementById('logoApp2').style.background = secondary;
+            document.getElementById('logoApp2').style.color = getContrastColor(secondary);
+            document.getElementById('logoApp3').style.background = accent;
+            document.getElementById('logoApp3').style.color = getContrastColor(accent);
+            document.getElementById('logoApp4').style.background = light;
+            document.getElementById('logoApp4').style.color = dark;
+            
+            // Wall (garde tel quel)
+            document.getElementById('wall1').style.background = colors[0];
+            document.getElementById('wall1').style.color = getContrastColor(colors[0]);
+            document.getElementById('wall2').style.background = colors[1];
+            document.getElementById('wall2').style.color = getContrastColor(colors[1]);
+            document.getElementById('wall3').style.background = colors[2];
+            document.getElementById('wall3').style.color = getContrastColor(colors[2]);
+            document.getElementById('wall4').style.background = colors[3];
+            document.getElementById('wall4').style.color = getContrastColor(colors[3]);
+            
+            // Mobile
+            document.getElementById('mobileStatus').style.background = primary;
+            document.getElementById('mobileStatus').style.color = getContrastColor(primary);
+            document.getElementById('mobileHeader').style.background = 'white';
+            document.getElementById('mobileHeader').style.color = primary;
+            document.getElementById('mobileCard1').style.background = light;
+            document.getElementById('mobileCard1').style.color = dark;
+            document.getElementById('mobileCard2').style.background = secondary + '15';
+            document.getElementById('mobileCard2').style.color = dark;
+            document.getElementById('mobileCard3').style.background = accent + '15';
+            document.getElementById('mobileCard3').style.color = dark;
+            document.getElementById('mobileTab1').style.background = primary;
+            document.getElementById('mobileTab1').style.color = getContrastColor(primary);
+            document.getElementById('mobileTab2').style.background = secondary + '30';
+            document.getElementById('mobileTab2').style.color = secondary;
+            document.getElementById('mobileTab3').style.background = accent + '30';
+            document.getElementById('mobileTab3').style.color = accent;
+        }
+
+        function getContrastColor(hexcolor) {
+            var rgb = hexToRgb(hexcolor);
+            var luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
+            return luminance > 0.5 ? '#000000' : '#FFFFFF';
+        }
+
+        function switchPreview(type) {
+            document.querySelectorAll('.preview-panel').forEach(function(panel) {
+                panel.classList.remove('active');
+            });
+            document.querySelectorAll('.preview-tab').forEach(function(tab) {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById('preview-' + type).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function randomPalette() {
+            var randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+            document.getElementById('baseColor').value = randomColor;
+            generatePalette();
+        }
+
+        // Init
+        updateContextInfo();
+        generatePalette();
+    </script>
+</body>
+</html>
